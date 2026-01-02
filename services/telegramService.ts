@@ -4,11 +4,13 @@
  * This service communicates with the Telegram Bot API.
  */
 
-const BOT_TOKEN = (process as any).env.TELEGRAM_BOT_TOKEN || '8303170421:AAH_xwrBNJnKt9oHrrLBIaP98g6Ev5ahL-E';
+// ۱. توکن بات را از @BotFather بگیرید و اینجا قرار دهید:
+const BOT_TOKEN = 'YOUR_BOT_TOKEN_HERE'; 
 
 export const sendTelegramReport = async (chatId: string, message: string) => {
-  if (!BOT_TOKEN || BOT_TOKEN === '8303170421:AAH_xwrBNJnKt9oHrrLBIaP98g6Ev5ahL-E' || !chatId) {
-    console.warn("Telegram Bot Token or Chat ID missing. Report not sent to Telegram.");
+  // اگر توکن وارد نشده باشد یا چت‌آیدی نباشد، ارسال نمی‌کنیم
+  if (!BOT_TOKEN || BOT_TOKEN === 'YOUR_BOT_TOKEN_HERE' || !chatId) {
+    console.warn("Telegram Configuration Missing: Check BOT_TOKEN and User ChatID.");
     return false;
   }
 
@@ -27,7 +29,7 @@ export const sendTelegramReport = async (chatId: string, message: string) => {
     const data = await response.json();
     return data.ok;
   } catch (error) {
-    console.error("Error sending Telegram message:", error);
+    console.error("Telegram error:", error);
     return false;
   }
 };
@@ -40,18 +42,23 @@ export const formatTelegramMessage = (
 ) => {
   const date = new Date().toLocaleDateString(isFa ? 'fa-IR' : 'en-US');
   
+  // فیلتر کردن فقط مواردی که تیک خورده‌اند (اختیاری - یا نمایش همه)
   let checklistStr = tasks.map(t => {
-    const icon = t.score === 4 ? '🔥' : t.score === 3 ? '✅' : t.score === 2 ? '🟡' : t.score === 1 ? '🟠' : '❌';
+    let icon = '❌';
+    if (t.score === 4) icon = '🔥';
+    else if (t.score === 3) icon = '✅';
+    else if (t.score === 2) icon = '🟡';
+    else if (t.score === 1) icon = '🟠';
+    
     return `${icon} ${t.label}`;
   }).join('\n');
 
   if (isFa) {
     return `
-📊 <b>گزارش تحول روزانه «مَنِ نو»</b>
-👤 کاربر: <b>${userName}</b>
+📊 <b>گزارش روزانه: ${userName}</b>
 📅 تاریخ: ${date}
 
-📝 <b>وضعیت چک‌لیست:</b>
+📝 <b>وضعیت عادت‌ها:</b>
 ${checklistStr}
 
 ✨ <b>تحلیل مربی هوشمند:</b>
@@ -61,14 +68,13 @@ ${checklistStr}
     `;
   } else {
     return `
-📊 <b>Mane No Daily Evolution Report</b>
-👤 User: <b>${userName}</b>
+📊 <b>Daily Report: ${userName}</b>
 📅 Date: ${date}
 
-📝 <b>Checklist Status:</b>
+📝 <b>Habits Status:</b>
 ${checklistStr}
 
-✨ <b>AI Coach Briefing:</b>
+✨ <b>AI Coach Analysis:</b>
 <i>${briefing}</i>
 
 🚀 @ManeNoBot

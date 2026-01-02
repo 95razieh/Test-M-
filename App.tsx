@@ -58,7 +58,7 @@ const App: React.FC = () => {
   const isInitialMount = useRef(true);
   
   const lang = profile.language || 'fa';
-  const t = translations[lang];
+  const t = translations[lang] || translations.fa;
 
   const addNotify = (message: string, type: 'info' | 'success' | 'error' = 'info') => {
     const id = Math.random().toString(36).substr(2, 9);
@@ -89,7 +89,7 @@ const App: React.FC = () => {
     if (savedComms) {
       setCommunities(JSON.parse(savedComms));
     } else {
-      setCommunities(MOCK_COMMUNITIES[lang]);
+      setCommunities(MOCK_COMMUNITIES[lang] || MOCK_COMMUNITIES.fa);
     }
 
     let templates: Omit<HabitTask, 'score'>[] = [];
@@ -162,14 +162,13 @@ const App: React.FC = () => {
     setProfile({
       ...finalProfile, 
       coins: 0, 
-      coachTone: 'scientific',
       friends: [],
       weightHistory: finalProfile.biometrics.weight ? [{date: new Date().toISOString().split('T')[0], weight: finalProfile.biometrics.weight}] : []
     });
     setHabitTemplates(habitsWithIds);
     setTasks(habitsWithIds.map(h => ({ ...h, score: 0 })));
     
-    const langSpecificComms = MOCK_COMMUNITIES[finalProfile.language];
+    const langSpecificComms = MOCK_COMMUNITIES[finalProfile.language] || MOCK_COMMUNITIES.fa;
     const updatedComms = langSpecificComms.map(c => joinedGroupIds.includes(c.id) ? { ...c, joined: true } : c);
     setCommunities(updatedComms);
     
@@ -244,14 +243,11 @@ const App: React.FC = () => {
       const brief = await getDailyStrategicBriefing(tasks, history, profile);
       setDailyBrief(brief);
 
-      // Telegram Sync Logic
       const userName = profile.preferredName || profile.name || profile.telegramId;
       const tgMessage = formatTelegramMessage(userName, tasks, brief, lang === 'fa');
       
-      // 1. Send to user private chat
       const userSent = await sendTelegramReport(profile.telegramId, tgMessage);
       
-      // 2. Send to joined community chats
       const joinedComms = communities.filter(c => c.joined && c.telegramChatId);
       for (const comm of joinedComms) {
         if (comm.telegramChatId) {
@@ -372,7 +368,7 @@ const App: React.FC = () => {
             lang={lang}
           />
           <HistoryAnalysis history={history} profile={profile} />
-          <DailyBriefing content={dailyBrief} loading={loadingBrief} onClose={() => setDailyBrief('')} lang={lang} />
+          <DailyBriefing content={dailyBrief} loading={loadingBrief} onClose={() => setDailyBrief('')} lang={lang} tone={profile.coachTone} />
         </div>
       )}
 

@@ -3,7 +3,7 @@ import { HabitCategory, HabitTask, Community, Language } from './types';
 
 export const DEFAULT_HABITS: Record<Language, Omit<HabitTask, 'id' | 'score'>[]> = {
   fa: [
-    { label: 'دیشب خواب خوب و کافی داشتم', category: HabitCategory.HEALTH, weight: 2 },
+    { label: 'دیشب خواب خوب و کافی داشتم', category: HabitCategory.HEALTH, weight: 3 },
     { label: 'امروز با طلوع خورشید بیدار شدم', category: HabitCategory.ROUTINE, weight: 2 },
     { label: 'امروز هوشیار و سوبر بودم', category: HabitCategory.MINDSET, weight: 3 },
     { label: 'امروز پاک از دود بودم', category: HabitCategory.HEALTH, weight: 3 },
@@ -24,7 +24,7 @@ export const DEFAULT_HABITS: Record<Language, Omit<HabitTask, 'id' | 'score'>[]>
     { label: 'امروز چالش شخصی‌ام را انجام دادم', category: HabitCategory.MINDSET, weight: 2 },
   ],
   en: [
-    { label: 'I had a good and sufficient sleep last night', category: HabitCategory.HEALTH, weight: 2 },
+    { label: 'I had a good and sufficient sleep last night', category: HabitCategory.HEALTH, weight: 3 },
     { label: 'I woke up with the sunrise today', category: HabitCategory.ROUTINE, weight: 2 },
     { label: 'I was sober today', category: HabitCategory.MINDSET, weight: 3 },
     { label: 'I was smoke-free today', category: HabitCategory.HEALTH, weight: 3 },

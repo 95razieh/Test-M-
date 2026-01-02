@@ -23,7 +23,7 @@ const OnboardingView: React.FC<OnboardingViewProps> = ({ onComplete }) => {
 
   const [profile, setProfile] = useState<UserProfile>({
     id: `user-${Date.now()}`,
-    name: '', lastName: '', telegramId: '', job: '', city: '', birthDate: '', onboarded: false, motto: '', language: 'fa',
+    name: '', lastName: '', telegramId: '', preferredName: '', job: '', city: '', birthDate: '', onboarded: false, motto: '', language: 'fa',
     biometrics: { gender: 'male', medicalHistory: '', weight: 75, height: 175 },
     superiorSelf: { vision: '', blooming: '', identity: '', lifestyle: '', habits: '' },
     coins: 0,
@@ -146,12 +146,22 @@ const OnboardingView: React.FC<OnboardingViewProps> = ({ onComplete }) => {
           {step === 1 && (
             <div className="animate-slide-up space-y-6">
               <h2 className="text-4xl font-black text-slate-800 leading-tight">{isFa ? 'به «مَنِ نو» خوش اومدی' : 'Welcome to Mane No'}</h2>
-              <p className="text-slate-500 font-medium text-lg">{isFa ? 'اطلاعات خود را برای شخصی‌سازی وارد کنید (اختیاری).' : 'Enter your info for personalization (optional).'}</p>
+              
               <div className="grid grid-cols-2 gap-4 pt-4">
                 <input placeholder={isFa ? "نام (اختیاری)" : "First Name"} value={profile.name} onChange={e => setProfile({...profile, name: e.target.value})} className="bg-slate-50 border-none rounded-2xl p-5 font-bold text-slate-800 focus:ring-2 focus:ring-indigo-500" />
                 <input placeholder={isFa ? "نام خانوادگی (اختیاری)" : "Last Name"} value={profile.lastName} onChange={e => setProfile({...profile, lastName: e.target.value})} className="bg-slate-50 border-none rounded-2xl p-5 font-bold text-slate-800 focus:ring-2 focus:ring-indigo-500" />
               </div>
               
+              <div className="space-y-2">
+                <label className="text-[10px] font-black text-slate-400 block mb-1 uppercase tracking-widest px-1">{t.preferredNameLabel}</label>
+                <input 
+                  placeholder={t.preferredNamePlaceholder} 
+                  value={profile.preferredName} 
+                  onChange={e => setProfile({...profile, preferredName: e.target.value})} 
+                  className="w-full bg-[#1a1f2c] text-white rounded-2xl p-5 font-black placeholder:text-white/30 focus:ring-2 focus:ring-indigo-500 shadow-xl" 
+                />
+              </div>
+
               <div className="space-y-2">
                 <label className="text-[10px] font-black text-slate-400 block mb-1 uppercase tracking-widest px-1">{t.telegramId}</label>
                 <input 
@@ -160,6 +170,9 @@ const OnboardingView: React.FC<OnboardingViewProps> = ({ onComplete }) => {
                   onChange={e => setProfile({...profile, telegramId: e.target.value})} 
                   className="w-full bg-indigo-50 border-2 border-dashed border-indigo-100 rounded-2xl p-5 font-bold text-indigo-900 focus:ring-2 focus:ring-indigo-500" 
                 />
+                <p className="text-[10px] text-slate-400 mt-1 px-1">
+                  {isFa ? '💡 راهنما: یوزرنیم وارد نکنید. به ربات @userinfobot پیام بدهید و آیدی عددی خود را اینجا کپی کنید.' : '💡 Hint: Do not enter username. Message @userinfobot and copy your numeric Chat ID here.'}
+                </p>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
@@ -373,7 +386,7 @@ const OnboardingView: React.FC<OnboardingViewProps> = ({ onComplete }) => {
         </div>
 
         <div className="mt-8 flex gap-4 shrink-0 pb-8">
-          {step > 1 && (
+          {step > 0 && (
             <button 
               onClick={prevStep} 
               className="flex-1 py-5 rounded-[2rem] font-black text-slate-400 bg-slate-50 hover:bg-slate-100 transition-all border border-slate-100"
@@ -385,7 +398,6 @@ const OnboardingView: React.FC<OnboardingViewProps> = ({ onComplete }) => {
             <button 
               onClick={nextStep} 
               disabled={
-                (step === 1 && !profile.telegramId.trim()) || // Telegram ID is required
                 (step === 3 && !profile.superiorSelf.vision.trim())
               } 
               className="flex-[2] py-5 rounded-[2rem] font-black text-white bg-indigo-600 disabled:bg-slate-100 disabled:text-slate-300 hover:bg-indigo-700 transition-all shadow-xl shadow-indigo-100"
