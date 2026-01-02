@@ -69,42 +69,48 @@ const App: React.FC = () => {
   };
 
   useEffect(() => {
-    const savedHistory = localStorage.getItem('man_no_history_v5');
-    const savedTemplates = localStorage.getItem('man_no_habit_templates_v5');
-    const savedProfile = localStorage.getItem('man_no_profile_v5');
-    const savedComms = localStorage.getItem('man_no_communities_v5');
-    
-    if (savedProfile) {
-      const parsed = JSON.parse(savedProfile);
-      setProfile({ 
-        ...parsed, 
-        friends: parsed.friends || [],
-        weightHistory: parsed.weightHistory || [],
-        preferredName: parsed.preferredName || ''
-      });
-    }
+    try {
+      const savedHistory = localStorage.getItem('man_no_history_v5');
+      const savedTemplates = localStorage.getItem('man_no_habit_templates_v5');
+      const savedProfile = localStorage.getItem('man_no_profile_v5');
+      const savedComms = localStorage.getItem('man_no_communities_v5');
+      
+      if (savedProfile) {
+        const parsed = JSON.parse(savedProfile);
+        setProfile({ 
+          ...parsed, 
+          friends: parsed.friends || [],
+          weightHistory: parsed.weightHistory || [],
+          preferredName: parsed.preferredName || ''
+        });
+      }
 
-    if (savedHistory) setHistory(JSON.parse(savedHistory));
-    
-    if (savedComms) {
-      setCommunities(JSON.parse(savedComms));
-    } else {
-      setCommunities(MOCK_COMMUNITIES[lang] || MOCK_COMMUNITIES.fa);
-    }
+      if (savedHistory) setHistory(JSON.parse(savedHistory));
+      
+      const currentLang = savedProfile ? JSON.parse(savedProfile).language : 'fa';
+      if (savedComms) {
+        setCommunities(JSON.parse(savedComms));
+      } else {
+        setCommunities(MOCK_COMMUNITIES[currentLang] || MOCK_COMMUNITIES.fa);
+      }
 
-    let templates: Omit<HabitTask, 'score'>[] = [];
-    if (savedTemplates) {
-      templates = JSON.parse(savedTemplates);
-      setHabitTemplates(templates);
-    }
+      let templates: Omit<HabitTask, 'score'>[] = [];
+      if (savedTemplates) {
+        templates = JSON.parse(savedTemplates);
+        setHabitTemplates(templates);
+      }
 
-    const fullHistory: HistoryData = savedHistory ? JSON.parse(savedHistory) : {};
-    const dayData = fullHistory[selectedDate];
-    
-    if (dayData && dayData.tasks && dayData.tasks.length > 0) {
-      setTasks(dayData.tasks);
-    } else if (templates.length > 0) {
-      setTasks(templates.map(h => ({ ...h, score: 0 })));
+      const fullHistory: HistoryData = savedHistory ? JSON.parse(savedHistory) : {};
+      const dayData = fullHistory[selectedDate];
+      
+      if (dayData && dayData.tasks && dayData.tasks.length > 0) {
+        setTasks(dayData.tasks);
+      } else if (templates.length > 0) {
+        setTasks(templates.map(h => ({ ...h, score: 0 })));
+      }
+    } catch (e) {
+      console.error("Critical error loading initial state:", e);
+      addNotify("خطا در بازیابی اطلاعات. داده‌ها بازنشانی شدند.", "error");
     }
 
     isInitialMount.current = false;
