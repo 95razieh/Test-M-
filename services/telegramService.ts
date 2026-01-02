@@ -4,10 +4,10 @@
  * This service communicates with the Telegram Bot API.
  */
 
-const BOT_TOKEN = (process as any).env.TELEGRAM_BOT_TOKEN || 'YOUR_BOT_TOKEN_HERE';
+const BOT_TOKEN = (process as any).env.TELEGRAM_BOT_TOKEN || '8303170421:AAH_xwrBNJnKt9oHrrLBIaP98g6Ev5ahL-E';
 
 export const sendTelegramReport = async (chatId: string, message: string) => {
-  if (!BOT_TOKEN || BOT_TOKEN === 'YOUR_BOT_TOKEN_HERE' || !chatId) {
+  if (!BOT_TOKEN || BOT_TOKEN === '8303170421:AAH_xwrBNJnKt9oHrrLBIaP98g6Ev5ahL-E' || !chatId) {
     console.warn("Telegram Bot Token or Chat ID missing. Report not sent to Telegram.");
     return false;
   }
