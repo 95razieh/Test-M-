@@ -1,19 +1,19 @@
 
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
-import { HabitTask, HistoryData, DayProgress, HabitCategory, UserProfile, Community, Language, CoachTone } from './types';
-import { DEFAULT_HABITS, MOCK_COMMUNITIES } from './constants';
-import ChecklistItem from './components/ChecklistItem';
-import StatsPanel from './components/StatsPanel';
-import AddTask from './components/AddTask';
-import ProfileView from './components/ProfileView';
-import CommunityView from './components/CommunityView';
-import HistoryAnalysis from './components/HistoryAnalysis';
-import DailyBriefing from './components/DailyBriefing';
-import OnboardingView from './components/OnboardingView';
-import LessonView from './components/LessonView';
-import { getDailyStrategicBriefing } from './services/geminiService';
-import { translations } from './translations';
-import { formatTelegramMessage, sendTelegramReport } from './services/telegramService';
+import { HabitTask, HistoryData, DayProgress, HabitCategory, UserProfile, Community, Language, CoachTone } from './types.ts';
+import { DEFAULT_HABITS, MOCK_COMMUNITIES } from './constants.ts';
+import ChecklistItem from './components/ChecklistItem.tsx';
+import StatsPanel from './components/StatsPanel.tsx';
+import AddTask from './components/AddTask.tsx';
+import ProfileView from './components/ProfileView.tsx';
+import CommunityView from './components/CommunityView.tsx';
+import HistoryAnalysis from './components/HistoryAnalysis.tsx';
+import DailyBriefing from './components/DailyBriefing.tsx';
+import OnboardingView from './components/OnboardingView.tsx';
+import LessonView from './components/LessonView.tsx';
+import { getDailyStrategicBriefing } from './services/geminiService.ts';
+import { translations } from './translations.ts';
+import { formatTelegramMessage, sendTelegramReport } from './services/telegramService.ts';
 
 interface Notification {
   id: string;
@@ -110,7 +110,6 @@ const App: React.FC = () => {
       }
     } catch (e) {
       console.error("Critical error loading initial state:", e);
-      addNotify("خطا در بازیابی اطلاعات. داده‌ها بازنشانی شدند.", "error");
     }
 
     isInitialMount.current = false;
