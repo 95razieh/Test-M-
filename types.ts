@@ -1,6 +1,6 @@
 
 export type Language = 'fa' | 'en';
-export type CoachTone = 'strict' | 'compassionate' | 'scientific' | 'enthusiastic' | 'pythonic';
+export type CoachTone = 'strict' | 'compassionate' | 'scientific' | 'enthusiastic';
 
 export interface HabitTask {
   id: string;
@@ -53,7 +53,7 @@ export interface UserProfile {
   name: string;
   lastName: string;
   telegramId: string;
-  preferredName: string; 
+  preferredName: string; // New field: What should we call you?
   job: string;
   city: string;
   birthDate: string;

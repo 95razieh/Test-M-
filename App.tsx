@@ -1,19 +1,18 @@
 
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
-import { HabitTask, HistoryData, DayProgress, HabitCategory, UserProfile, Community, Language, CoachTone } from './types.ts';
-import { DEFAULT_HABITS, MOCK_COMMUNITIES } from './constants.ts';
-import ChecklistItem from './components/ChecklistItem.tsx';
-import StatsPanel from './components/StatsPanel.tsx';
-import AddTask from './components/AddTask.tsx';
-import ProfileView from './components/ProfileView.tsx';
-import CommunityView from './components/CommunityView.tsx';
-import HistoryAnalysis from './components/HistoryAnalysis.tsx';
-import DailyBriefing from './components/DailyBriefing.tsx';
-import OnboardingView from './components/OnboardingView.tsx';
-import LessonView from './components/LessonView.tsx';
-import { getDailyStrategicBriefing } from './services/geminiService.ts';
-import { translations } from './translations.ts';
-import { formatTelegramMessage, sendTelegramReport } from './services/telegramService.ts';
+import { HabitTask, HistoryData, DayProgress, HabitCategory, UserProfile, Community, Language, CoachTone } from './types';
+import { DEFAULT_HABITS, MOCK_COMMUNITIES } from './constants';
+import ChecklistItem from './components/ChecklistItem';
+import StatsPanel from './components/StatsPanel';
+import AddTask from './components/AddTask';
+import ProfileView from './components/ProfileView';
+import CommunityView from './components/CommunityView';
+import HistoryAnalysis from './components/HistoryAnalysis';
+import DailyBriefing from './components/DailyBriefing';
+import OnboardingView from './components/OnboardingView';
+import LessonView from './components/LessonView';
+import { getDailyStrategicBriefing } from './services/geminiService';
+import { translations } from './translations';
 
 interface Notification {
   id: string;
@@ -33,7 +32,7 @@ const App: React.FC = () => {
     name: '',
     lastName: '',
     telegramId: '',
-    preferredName: '', 
+    preferredName: '', // Initialize new field
     job: '',
     city: '',
     birthDate: '',
@@ -58,7 +57,7 @@ const App: React.FC = () => {
   const isInitialMount = useRef(true);
   
   const lang = profile.language || 'fa';
-  const t = translations[lang] || translations.fa;
+  const t = translations[lang];
 
   const addNotify = (message: string, type: 'info' | 'success' | 'error' = 'info') => {
     const id = Math.random().toString(36).substr(2, 9);
@@ -69,47 +68,42 @@ const App: React.FC = () => {
   };
 
   useEffect(() => {
-    try {
-      const savedHistory = localStorage.getItem('man_no_history_v5');
-      const savedTemplates = localStorage.getItem('man_no_habit_templates_v5');
-      const savedProfile = localStorage.getItem('man_no_profile_v5');
-      const savedComms = localStorage.getItem('man_no_communities_v5');
-      
-      if (savedProfile) {
-        const parsed = JSON.parse(savedProfile);
-        setProfile({ 
-          ...parsed, 
-          friends: parsed.friends || [],
-          weightHistory: parsed.weightHistory || [],
-          preferredName: parsed.preferredName || ''
-        });
-      }
+    const savedHistory = localStorage.getItem('man_no_history_v5');
+    const savedTemplates = localStorage.getItem('man_no_habit_templates_v5');
+    const savedProfile = localStorage.getItem('man_no_profile_v5');
+    const savedComms = localStorage.getItem('man_no_communities_v5');
+    
+    if (savedProfile) {
+      const parsed = JSON.parse(savedProfile);
+      setProfile({ 
+        ...parsed, 
+        friends: parsed.friends || [],
+        weightHistory: parsed.weightHistory || [],
+        preferredName: parsed.preferredName || ''
+      });
+    }
 
-      if (savedHistory) setHistory(JSON.parse(savedHistory));
-      
-      const currentLang = savedProfile ? JSON.parse(savedProfile).language : 'fa';
-      if (savedComms) {
-        setCommunities(JSON.parse(savedComms));
-      } else {
-        setCommunities(MOCK_COMMUNITIES[currentLang] || MOCK_COMMUNITIES.fa);
-      }
+    if (savedHistory) setHistory(JSON.parse(savedHistory));
+    
+    if (savedComms) {
+      setCommunities(JSON.parse(savedComms));
+    } else {
+      setCommunities(MOCK_COMMUNITIES[lang]);
+    }
 
-      let templates: Omit<HabitTask, 'score'>[] = [];
-      if (savedTemplates) {
-        templates = JSON.parse(savedTemplates);
-        setHabitTemplates(templates);
-      }
+    let templates: Omit<HabitTask, 'score'>[] = [];
+    if (savedTemplates) {
+      templates = JSON.parse(savedTemplates);
+      setHabitTemplates(templates);
+    }
 
-      const fullHistory: HistoryData = savedHistory ? JSON.parse(savedHistory) : {};
-      const dayData = fullHistory[selectedDate];
-      
-      if (dayData && dayData.tasks && dayData.tasks.length > 0) {
-        setTasks(dayData.tasks);
-      } else if (templates.length > 0) {
-        setTasks(templates.map(h => ({ ...h, score: 0 })));
-      }
-    } catch (e) {
-      console.error("Critical error loading initial state:", e);
+    const fullHistory: HistoryData = savedHistory ? JSON.parse(savedHistory) : {};
+    const dayData = fullHistory[selectedDate];
+    
+    if (dayData && dayData.tasks && dayData.tasks.length > 0) {
+      setTasks(dayData.tasks);
+    } else if (templates.length > 0) {
+      setTasks(templates.map(h => ({ ...h, score: 0 })));
     }
 
     isInitialMount.current = false;
@@ -167,13 +161,14 @@ const App: React.FC = () => {
     setProfile({
       ...finalProfile, 
       coins: 0, 
+      coachTone: 'scientific',
       friends: [],
       weightHistory: finalProfile.biometrics.weight ? [{date: new Date().toISOString().split('T')[0], weight: finalProfile.biometrics.weight}] : []
     });
     setHabitTemplates(habitsWithIds);
     setTasks(habitsWithIds.map(h => ({ ...h, score: 0 })));
     
-    const langSpecificComms = MOCK_COMMUNITIES[finalProfile.language] || MOCK_COMMUNITIES.fa;
+    const langSpecificComms = MOCK_COMMUNITIES[finalProfile.language];
     const updatedComms = langSpecificComms.map(c => joinedGroupIds.includes(c.id) ? { ...c, joined: true } : c);
     setCommunities(updatedComms);
     
@@ -247,25 +242,6 @@ const App: React.FC = () => {
     try {
       const brief = await getDailyStrategicBriefing(tasks, history, profile);
       setDailyBrief(brief);
-
-      const userName = profile.preferredName || profile.name || profile.telegramId;
-      const tgMessage = formatTelegramMessage(userName, tasks, brief, lang === 'fa');
-      
-      const userSent = await sendTelegramReport(profile.telegramId, tgMessage);
-      
-      const joinedComms = communities.filter(c => c.joined && c.telegramChatId);
-      for (const comm of joinedComms) {
-        if (comm.telegramChatId) {
-          await sendTelegramReport(comm.telegramChatId, tgMessage);
-        }
-      }
-
-      if (userSent) {
-        addNotify(t.telegramSent, 'success');
-      } else if (profile.telegramId) {
-        addNotify(t.telegramError, 'error');
-      }
-
     } catch (e) {
       addNotify(t.analysisError, 'error');
     } finally {
@@ -373,7 +349,7 @@ const App: React.FC = () => {
             lang={lang}
           />
           <HistoryAnalysis history={history} profile={profile} />
-          <DailyBriefing content={dailyBrief} loading={loadingBrief} onClose={() => setDailyBrief('')} lang={lang} tone={profile.coachTone} />
+          <DailyBriefing content={dailyBrief} loading={loadingBrief} onClose={() => setDailyBrief('')} lang={lang} />
         </div>
       )}
 

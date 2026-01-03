@@ -20,6 +20,7 @@ export const getDailyStrategicBriefing = async (
   const tone = profile.coachTone || 'scientific';
   const todayScore = calculateWeightedScore(currentTasks);
   
+  // Choose the best name to address the user
   const userName = profile.preferredName || profile.name || profile.telegramId || (lang === 'fa' ? 'قهرمان' : 'Hero');
 
   const summary = currentTasks.map(t => {
@@ -31,9 +32,9 @@ export const getDailyStrategicBriefing = async (
                t.score === 1 ? "حداقلی" : "انجام نشده";
     } else {
       status = t.score === 4 ? "Excellent and complete" : 
-               status = t.score === 3 ? "Very good" : 
-               status = t.score === 2 ? "Average" : 
-               status = t.score === 1 ? "Minimal" : "Not done";
+               t.score === 3 ? "Very good" : 
+               t.score === 2 ? "Average" : 
+               t.score === 1 ? "Minimal" : "Not done";
     }
     return `- ${t.label}: ${status}`;
   }).join("\n");
@@ -46,8 +47,7 @@ export const getDailyStrategicBriefing = async (
     strict: "Be very disciplined, direct, and results-oriented. Focus on accountability. If they missed something, point it out firmly.",
     compassionate: "Be very kind, empathetic, and focus on self-love. Celebrate small victories and encourage them gently even if they failed.",
     scientific: "Be analytical, use biohacking terminology, and focus on data-driven insights. Explain the physiological benefit of their actions.",
-    enthusiastic: "Be high energy, use lots of exclamation marks and emojis. Be their ultimate hype person. Maximize motivation.",
-    pythonic: "Talk like a Python script or a highly logical developer. Use code syntax concepts like 'if/else', 'classes', 'exceptions', and 'optimization'. Format your report as if it were a log output or a code review. Be logical, clean, and efficient."
+    enthusiastic: "Be high energy, use lots of exclamation marks and emojis. Be their ultimate hype person. Maximize motivation."
   };
 
   const specialConditions = profile.lifeContext 
@@ -76,7 +76,7 @@ export const getDailyStrategicBriefing = async (
     4. Strategy for Tomorrow: 1 or 2 practical steps.
     5. Conclusion: A powerful sentence that matches your tone.
     
-    Use relevant emojis. If tone is 'pythonic', use programming-related emojis like 🐍, 💻, ⚙️.
+    Use relevant emojis.
   `;
 
   try {
